@@ -4,6 +4,7 @@
 # Game summary
 - Game name: ?
 - Game serial: ?
+- Game version: ?
 
 # Vita3K summary
 - Version: v?
