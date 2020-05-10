@@ -1,10 +1,10 @@
 <!-- Please use the game's name for issue Title -->
 <!-- Amend ? below with the correct information -->
 
-# Game summary
-- Game name: ?
-- Game serial: ?
-- Game version: ?
+# App summary
+- App name: ?
+- App serial: ?
+- App version: ?
 
 # Vita3K summary
 - Version: v?
