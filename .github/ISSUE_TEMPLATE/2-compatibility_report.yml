@@ -1,0 +1,86 @@
+name: Compatibility Report (Beta)
+description: Compatibility report for Vita3K commercial games (Beta)
+title: "Game title [Title id]"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this report!
+  - type: textarea
+    id: appsummary
+    attributes:
+      label: App summary
+      description: "Please add app summary you tested.App serial should start with PCS"
+      value: |
+       - App name: 
+       - App serial: 
+       - App version: 
+    validations:
+      required: true
+  - type: textarea
+    id: vita3ksummary
+    attributes:
+      label: Vita3K summary
+      value: |
+       - Version: v?
+       - Build number: ?
+       - Commit hash: https://github.com/vita3k/vita3k/commit/[commit] <!-- Replace "[commit]" with commit hash -->
+       - CPU backend: <!-- As of today Vita3K uses two CPU backend engines to run games: Unicorn and Dynarmic.
+                                 When testing games Dynarmic should be prefered as it normally gives better results than Unicorn.
+                                 You can change the CPU backend on the emu settings -->
+       - GPU backend: <!-- Vita3K has the option to choose bewteen Vulkan and OpenGL, 
+                                 there is no superior option and one can have better results than other -->
+    validations:
+      required: true
+  - type: textarea
+    id: testenvsummary
+    attributes:
+      label: Test environment summary
+      value: |
+       - Tested by: ?
+       - OS: Windows/macOS/Linux Distro, Kernel Version? <!-- Please do not submit test results on Android as largely different result with PC -->
+       - CPU: AMD/Intel?
+       - GPU: AMD/NVIDIA/Intel?
+       - RAM: ? GB
+    validations:
+      required: true
+  - type: textarea
+    id: issues
+    attributes:
+      label: Issues
+      description: Summary of problems.
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log
+      description: Please drop log file. 
+    validations:
+      required: true
+  - type: dropdown
+    id: label
+    attributes:
+      label: label
+      description: What labels do you recommend?
+      options:
+        - Nothing
+        - Intro
+        - Menu
+        - Ingame -
+        - Ingame +
+        - Playable
+    validations:
+      required: true
+  - type: textarea
+    id: labels
+    attributes:
+      label: labels
+      description: What labels do you recommend?
+                   See https://github.com/Vita3K/compatibility/labels.
+      placeholder: |
+       - audio bug
+       - black screen
+       - crash
+       etc...
+      render: bash
