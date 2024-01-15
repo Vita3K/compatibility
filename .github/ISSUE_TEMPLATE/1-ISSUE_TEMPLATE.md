@@ -1,7 +1,7 @@
 ---
 name: Compatibility Report
 about: Legacy style, everything can be entered in an editable style
-title: 'Game title [Title id]'
+title: 'App name [App serial]'
 labels: ''
 assignees: ''
 
@@ -47,6 +47,7 @@ assignees: ''
 
 # Recommended labels
 <!-- See https://github.com/Vita3K/compatibility/labels -->
+<!-- One of the following status labels must be assigned [Nothing, Bootable, Intro, Menu, Ingame-, Ingame+, Playable] -->
 - A?
 - B?
 - C?
