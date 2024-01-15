@@ -58,29 +58,19 @@ body:
       description: Please drop log file. 
     validations:
       required: true
-  - type: dropdown
-    id: label
-    attributes:
-      label: label
-      description: What labels do you recommend?
-      options:
-        - Nothing
-        - Intro
-        - Menu
-        - Ingame -
-        - Ingame +
-        - Playable
-    validations:
-      required: true
   - type: textarea
     id: labels
     attributes:
-      label: labels
-      description: What labels do you recommend?
-                   See https://github.com/Vita3K/compatibility/labels.
+      label: Recommended labels
+      description: |
+        What labels do you recommend?
+        See https://github.com/Vita3K/compatibility/labels.
+        One of the following status labels must be assigned [Nothing, Bootable, Intro, Menu, Ingame-, Ingame+, Playable]
       placeholder: |
        - audio bug
        - black screen
        - crash
+       - [Nothing, Bootable, Intro, Menu, Ingame-, Ingame+, Playable]
        etc...
-      render: bash
+    validations:
+      required: true
