@@ -7,6 +7,7 @@ on:
 jobs:
   update_compat_db:
     runs-on: windows-latest
+    if: github.repository == 'Vita3K/compatibility'
 
     steps:
     - uses: actions/checkout@v3
