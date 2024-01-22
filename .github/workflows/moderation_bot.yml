@@ -29,7 +29,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # modifyied for Vita3K
-# TODO: add check android issue, scrrenshots and log provide.
+# TODO: add check scrrenshots and log provide.
 # I don't think pull_request needs auto moderation
 # original code contains for pull request but I delete it
 
@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     # if: github.repository == 'Vita3K/compatibility'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: checking an issue
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -133,6 +133,13 @@ jobs:
               else
                 compatibility_report_invalidate 'Commit hash is invalid or missing.'
               fi
+              # Check Android issue
+              issue_body_trim1 'OS'
+              if [[ "$issue_body_trim1" =~ (.+ Android) ]]; then
+                compatibility_report_invalidate 'Android issue detected.'
+              else
+                echo 'Android is not detected'
+              fi
             fi
           fi
 
@@ -156,37 +163,24 @@ jobs:
           case $GITHUB_EVENT_NAME in
             issues)
               issue_body_trim2 'Recommended labels'
-              issue_labels_body=($(
-                echo "$issue_body_trim2" | sed '/# Recommended labels/d' | sed '/<!--/,/-->/d' |
-                awk '{
-                  gsub(/ *( *,|\|| -* ?| ?-* |  *|--+|\++|\\+|\/|and|&|;|:) */," ");
-                  gsub(/^\s+|\s+$|\s+(?=\s)/,"");
-                }1
-              ')
-              )
-              echo "Issue labels body: ${issue_labels_body[*]}"
-              if (( ${#issue_labels_body[@]} > 0 && ${#issue_labels_body[@]} < 10 )); then
-                for issue_label in "${issue_labels_body[@]}"; do
-                  if [[ "${repository_labels[@]}" =~ "$issue_label" && ! "${repository_labels_invalid[@]}" =~ "$issue_label" ]]; then
-                    echo "Valid label detected: $issue_label"
-                    labels_to_add+="${issue_label},"
-                  else
-                    echo "Invalid label detected: $issue_label"
-                    issue_labels_invalid_used+=$'\n'"    * $issue_label"
+              issue_labels_body=$(echo "$issue_body_trim2" | sed '/# Recommended labels/d'| sed '/<!--[^>]*-->/d')
+                for repository_label in "${repository_labels[@]}"; do
+                  if [[ "$issue_labels_body" =~ "$repository_label" ]]; then
+                    echo "Valid label detected: $repository_label"
+                    labels_to_add+=("$repository_label")
                   fi
                 done
-                if [ -z "$issue_labels_invalid_used" ]; then
-                  echo 'No invalid labels were used.'
-                else
-                  compatibility_report_invalidate "Invalid label(s) provided;$issue_labels_invalid_used"
-                fi
-              else ## Abort if 0 or more than 10
-                echo 'Too many or not enough labels were detected. Skipping...'
-              fi
               if [ -n "$labels_to_add" ]; then
-                ## Remove trailing comma
-                labels_to_add="${labels_to_add/%,/}"
-                issue_labels_state_count=$(echo "$labels_to_add" | grep -oE 'Nothing|Bootable|Intro|Menu|Ingame-|Ingame+|Playable' | wc -l)
+              status_label_list=("Nothing" "Bootable" "Intro" "Menu" "Ingame -" "Ingame +" "Playable")
+              issue_labels_state_count=0
+              for status_labels in "${status_label_list[@]}"; do
+                for issue_labels in "${labels_to_add[@]}"; do
+                  if [[ "$status_labels" == "$issue_labels" ]]; then
+                  issue_labels_state_count=$((issue_labels_state_count + 1))
+                  fi
+                done
+              done
+              echo "Status label count: $issue_labels_state_count"
                 if [[ $issue_labels_state_count -eq 1 ]]; then
                   echo 'State label was provided.'
                 elif [ $issue_labels_state_count -gt 1 ]; then
@@ -216,7 +210,7 @@ jobs:
                   if [ -n "$labels_to_add" ]; then
                     ## Remove trailing comma
                     labels_to_add="${labels_to_add/%,/}"
-                    issue_labels_state_count=$(echo "$labels_to_add" | grep -oE 'Nothing|Bootable|Intro|Menu|Ingame-|Ingame+|Playable' | wc -l)
+                    issue_labels_state_count=$(echo "$labels_to_add" | grep -oE 'Nothing|Bootable|Intro|Menu|Ingame -|Ingame +|Playable' | wc -l)
                     if [[ $issue_labels_state_count -eq 1 ]]; then
                       echo 'State label was provided.'
                     elif [ $issue_labels_state_count -gt 1 ]; then
@@ -239,6 +233,7 @@ jobs:
               gh issue reopen $issue_number
             fi
           else
+            labels_to_add=""
             echo "$github_event_name_friendly is invalid."
             ## Closing "invalid" (i.e. potentially outdated) edited issues is too risky
             if [[ ${{ github.event.action }} = opened && $GITHUB_EVENT_NAME != issue_comment ]]; then ## Only comment on 'opened' to prevent duplicate comments
@@ -251,7 +246,6 @@ jobs:
               fi
               comment_close_body+=$'\n\n'"If you want help with Vita3K and/or your game go to our Discord server's #help channel: https://discord.gg/6aGwQzh"
               gh "${github_event_name_friendly,,}" comment $issue_number -b "$comment_close_body"
-              labels_to_add=""
               if [ -n "$issue_duplicates" ]; then
                 labels_to_add="${repository_labels_invalid[1]}"
               else
@@ -260,6 +254,15 @@ jobs:
             fi
           fi
           if [ -n "$labels_to_add" ]; then
-            echo "Adding label(s): $labels_to_add"
-            gh issue edit $issue_number --add-label "$labels_to_add"
+            echo "Adding label(s): ${labels_to_add[@]}"
+            for adding_labels in "${labels_to_add[@]}"; do
+              # + and - are special characters in bash, so we need to escape them
+              if [[ "$adding_labels" =~ "Ingame -" ]]; then
+                gh issue edit $issue_number --add-label 'Ingame -'
+              elif [[ "$adding_labels" =~ "Ingame +" ]]; then
+                gh issue edit $issue_number --add-label 'Ingame +'
+              else
+                gh issue edit $issue_number --add-label "${adding_labels}"
+              fi
+            done
           fi

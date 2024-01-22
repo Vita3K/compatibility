@@ -28,8 +28,8 @@ assignees: ''
 
 # Test environment summary
 - Tested by: ?
-- OS: Windows/macOS/Linux Distro, Kernel Version? <!-- Please do not submit test results on Android
-                                                                                         as largely different result with PC.
+- OS: Windows/macOS/Linux Distro, Kernel Version? <!-- Please do not submit test results on 
+                                                                                         Android as largely different result with PC.
                                                                                          Please submit Android specific issues here
                                                                                          https://github.com/Vita3K/Vita3K-Android/issues -->
 - CPU: AMD/Intel?
@@ -47,7 +47,8 @@ assignees: ''
 
 # Recommended labels
 <!-- See https://github.com/Vita3K/compatibility/labels -->
-<!-- One of the following status labels must be assigned [Nothing, Bootable, Intro, Menu, Ingame-, Ingame+, Playable] -->
+<!-- One of the following status labels must be assigned [Nothing, Bootable, Intro, Menu, Ingame -, Ingame +, Playable] -->
+<!-- Watch out for capitalization and typos -->
 - A?
 - B?
 - C?

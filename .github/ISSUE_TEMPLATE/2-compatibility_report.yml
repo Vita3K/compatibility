@@ -36,9 +36,10 @@ body:
     id: testenvsummary
     attributes:
       label: Test environment summary
-      value: |
+      description: Please do not submit test results on Android as largely different result with PC
+      value: | 
        - Tested by: ?
-       - OS: Windows/macOS/Linux Distro, Kernel Version? <!-- Please do not submit test results on Android as largely different result with PC -->
+       - OS: Windows/macOS/Linux Distro, Kernel Version?
        - CPU: AMD/Intel?
        - GPU: AMD/NVIDIA/Intel?
        - RAM: ? GB
@@ -65,12 +66,13 @@ body:
       description: |
         What labels do you recommend?
         See https://github.com/Vita3K/compatibility/labels.
-        One of the following status labels must be assigned [Nothing, Bootable, Intro, Menu, Ingame-, Ingame+, Playable]
+        One of the following status labels must be assigned [Nothing, Bootable, Intro, Menu, Ingame -, Ingame +, Playable]
+        Watch out for capitalization and typos
       placeholder: |
        - audio bug
        - black screen
        - crash
-       - [Nothing, Bootable, Intro, Menu, Ingame-, Ingame+, Playable]
+       - [Nothing, Bootable, Intro, Menu, Ingame -, Ingame +, Playable]
        etc...
     validations:
       required: true
