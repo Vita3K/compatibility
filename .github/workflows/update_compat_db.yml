@@ -38,7 +38,7 @@ jobs:
         foreach ($page in $page_count) {
             $current_page = $page.First
             $per_page = $page.Second
-            $issues = (Invoke-RestMethod -Uri $issues_link"?page=$current_page&per_page=100" -Headers $headers)[0..$per_page]
+            $issues = (Invoke-RestMethod -Uri $issues_link"?page=$current_page&per_page=100" -Headers $headers)[0..$per_page] | Where-Object { $_.pull_request -eq $null }
             foreach ($issue in $issues) {
                 $issueNode = $xml.CreateElement("app")
                 $title = $issue.title.TrimEnd()
