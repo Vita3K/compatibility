@@ -63,16 +63,16 @@ jobs:
           case $GITHUB_EVENT_NAME in
             issues)
               github_event_name_friendly=issue
-              # can be make this better?
+              ## can be make this better?
               issue_body_trim1() {
-                issue_body_trim1=$(echo "$issue_body" | grep "$1")
+                issue_body_trim1=$(echo "$issue_body" | grep -i "$1")
               }
               issue_body_trim2() {
-                issue_body_trim2=$(echo "$issue_body" | grep "$1" -A 10)
+                issue_body_trim2=$(echo "$issue_body" | grep -i "$1" -A 10)
               };;
             issue_comment)
               issue_comment_body_trim() {
-                issue_comment_body_trim=$(echo "$issue_comment_body" | grep "$1" -A 10)
+                issue_comment_body_trim=$(echo "$issue_comment_body" | grep -i "$1" -A 10)
               }
               issue_comment_author_whitelist=(Zangetsu38 othmanead nishinji Macdu illusionMan1212 EXtremeExploit GamingDucking Croden1999 saturnsky tasle1001 spacemul gymzatan)
               for whitelisted_author in "${issue_comment_author_whitelist[@]}"; do
@@ -92,7 +92,7 @@ jobs:
             # Check issue title
             if [[ "$issue_title" =~ ^(.+ \[PCS[A-Z]{1}[0-9]{5}\]|.+ \[NPXS10007\])$ ]]; then
               echo 'Title is valid.'
-              ## Check for duplicate(s)
+              # Check for duplicate(s)
               if [ ${{ github.event.action }} = opened ]; then
                 repository_issues_json=$(gh api graphql --jq '.data.repository[]' --paginate -f query='
                   query($endCursor: String) {
@@ -165,11 +165,10 @@ jobs:
           repository_labels_invalid=("invalid issue" "duplicate issue" )
           case $GITHUB_EVENT_NAME in
             issues)
-              # TODO: Make comparisons in lowercase
               issue_body_trim2 'Recommended labels'
               issue_labels_body=$(echo "$issue_body_trim2" | sed '/# Recommended labels/d'| sed '/<!--[^>]*-->/d')
                 for repository_label in "${repository_labels[@]}"; do
-                  if [[ "$issue_labels_body" =~ "$repository_label" ]]; then
+                  if [[ "${issue_labels_body,,}" =~ "${repository_label,,}" ]]; then
                     echo "Valid label detected: $repository_label"
                     labels_to_add+=("$repository_label")
                   fi
@@ -195,15 +194,14 @@ jobs:
               else
                 compatibility_report_invalidate 'Labels are invalid or missing.'
               fi;;
-              # code for comment
-              # TODO: add support removing label
+            # code for comment
             issue_comment)
               if [ -n "$issue_comment_author_whitelisted" ]; then
                 issue_comment_body_trim 'Recommended labels'
-                issue_comment_labels_body=$(echo "$issue_comment_body_trim" | sed '/# Recommended labels/d' | sed '/<!--[^>]*-->/d')
+                issue_comment_labels_body=$(echo "${issue_comment_body_trim,,}" | sed '/# recommended labels/d' | sed '/<!--[^>]*-->/d')
                 echo "issue comment labels body: $issue_comment_labels_body"
                 for repository_label in "${repository_labels[@]}"; do
-                  if [[ "$issue_comment_labels_body" =~ "$repository_label" ]]; then
+                  if [[ "${issue_comment_labels_body,,}" =~ "${repository_label,,}" ]]; then
                     if [[ ! "${repository_labels_invalid[@]}" =~ "$repository_label" ]]; then
                     echo "Valid label detected: $repository_label"
                       labels_to_add+=("$repository_label")
@@ -276,7 +274,7 @@ jobs:
           if [ -n "$labels_to_add" ]; then
             echo "Adding label(s): ${labels_to_add[@]}"
             for adding_labels in "${labels_to_add[@]}"; do
-              # + and - are special characters in bash, so we need to escape them
+              ## + and - are special characters in bash, so we need to escape them
               if [[ "$adding_labels" =~ "Ingame -" ]]; then
                 gh issue edit $issue_number --add-label 'Ingame -'
               elif [[ "$adding_labels" =~ "Ingame +" ]]; then
