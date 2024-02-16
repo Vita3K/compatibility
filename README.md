@@ -8,6 +8,21 @@ If you want to be a tester and help test games, ask us for write access on our D
 
 ### Note: This repository does **not** guarantee compatibility and is not intended for Android. Submit Android specific issues [here](https://github.com/Vita3K/Vita3K-Android/issues).
 
+### What NOT to post:
+
+  * Non English comments.
+  * Tech Support:
+    * `How do I do/fix X?`
+    * `How do I get games?`
+    * `Why won't Vita3K start?`
+    * `Why is Vita3K running slow/low FPS?` etc.
+  * Begging:
+    * `Please fix this/get it working/etc!`
+    * `When/how will this be fixed?`
+    * `This was my childhood game, please get it working.`
+ 
+These comments will be deleted as soon as we find them.
+
 ## Report guidelines:
 
 If you can't find the game issue you want to report, please create a new one.
