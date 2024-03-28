@@ -67,7 +67,8 @@ jobs:
                 $issue_count++
             }
         }
-        $xml.Save("app_compat_db.xml")  
+        $root.SetAttribute("issue_count", $issue_count)
+        $xml.Save("app_compat_db.xml")
         "$issue_count issues have been retrieved from the compatibility database"
 
         Add-Content -Path $env:GITHUB_ENV -Value "db_updated_at=$db_updated_at"
