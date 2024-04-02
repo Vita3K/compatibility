@@ -10,7 +10,7 @@ jobs:
     if: github.repository == 'Vita3K/compatibility'
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Generate compatibility database xml file
       run: |
         $headers = @{
