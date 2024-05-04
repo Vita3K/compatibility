@@ -276,9 +276,7 @@ jobs:
               comment_close_body="@$issue_author your ${github_event_name_friendly,,} was automatically closed because it didn't follow the issue templates."
               comment_close_body+=$'\n'"Here is what's wrong with your compatibility report:"
               comment_close_body+="$compatibility_report_invalid_reasons"
-              if [ $GITHUB_EVENT_NAME = issues ]; then
-                comment_close_body+=$'\n\n'"**Don't submit a new ${github_event_name_friendly,,}.** Just edit this one and if it's valid it will be automatically reopened."
-              fi
+              comment_close_body+=$'\n\n'"**Don't submit a new issue.** Just edit this one and if it's valid it will be automatically reopened."
               comment_close_body+=$'\n\n'"If you want help with Vita3K and/or your game go to our Discord server's #help channel: https://discord.gg/6aGwQzh"
               gh "${github_event_name_friendly,,}" comment $issue_number -b "$comment_close_body"
               if [ -n "$issue_duplicates" ]; then
