@@ -262,7 +262,7 @@ jobs:
 
           if [ -z "$compatibility_report_invalid_reasons" ]; then
             echo "$github_event_name_friendly is valid."
-            if [[ $issue_state = closed && "$issue_labels" =~ ${repository_labels_invalid[0]}|${repository_labels_invalid[1]} ]]; then
+            if [[ $issue_state = closed && "$issue_labels" =~ ${repository_labels_invalid[0]}|${repository_labels_invalid[1]} && $GITHUB_EVENT_NAME != issue_comment ]]; then ## Don't reopen by issue comment
               ## TODO: Hide (or delete) the close comment if issue is reopened
               gh issue edit $issue_number --remove-label "${repository_labels_invalid[0]},${repository_labels_invalid[1]}"
               gh issue reopen $issue_number
