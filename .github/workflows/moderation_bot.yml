@@ -44,7 +44,7 @@ on:
 jobs:
   automoderation:
     runs-on: ubuntu-latest
-    # if: github.repository == 'Vita3K/compatibility'
+    if: github.repository == 'Vita3K/compatibility'
     steps:
       - uses: actions/checkout@v4
       - name: checking an issue
