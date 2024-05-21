@@ -8,7 +8,6 @@ jobs:
   update_compat_db:
     runs-on: windows-latest
     if: github.repository == 'Vita3K/compatibility'
-
     steps:
     - uses: actions/checkout@v4
     - name: Generate compatibility database xml file

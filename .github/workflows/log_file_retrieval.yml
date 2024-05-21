@@ -1,0 +1,45 @@
+name: Log File Retrieval
+
+on:
+  schedule:
+  - cron: '0 0 * * 0' # Run every Sunday at midnight
+  workflow_dispatch:
+
+jobs:
+  retrieve_logs:
+    runs-on: ubuntu-latest
+    if: github.repository == 'Vita3K/compatibility'
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: |
+        pip install PyGithub
+
+    - name: Retrieve log files
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        python .github/workflows/script/collect_vita3k_logs.py
+
+    - name: Zip compatibility database
+      run: |
+        7z a -mx=9 logs.7z logs/
+
+    - name: Upload log files
+      uses: actions/upload-artifact@v4
+      with:
+        name: logs-archive-zip
+        path: logs/
+
+    - name: Upload 7zipped log files
+      uses: actions/upload-artifact@v4
+      with:
+        name: logs-archive-7z
+        path: logs.7z
