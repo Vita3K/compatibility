@@ -28,10 +28,10 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# modifyied for Vita3K
-# TODO: add check scrrenshots and log provide.
+# Modifyied for Vita3K
+# TODO: add check screenshots and log provide.
 # I don't think pull_request needs auto moderation
-# original code contains for pull request but I delete it
+# Original code contains for pull request but I delete it
 
 name: Compatibility bot
 
