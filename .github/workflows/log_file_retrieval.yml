@@ -2,7 +2,7 @@ name: Log File Retrieval
 
 on:
   schedule:
-  - cron: '0 0 * * 0' # Run every Sunday at midnight
+  - cron: '0 0 1 * *' # Runs at midnight on the first day of each month
   workflow_dispatch:
 
 jobs:
