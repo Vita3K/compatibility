@@ -18,7 +18,8 @@ jobs:
         $compat_link = "https://api.github.com/repos/Vita3K/compatibility"
         $issues_link = $compat_link + "/issues"
         $app_updated = (Invoke-RestMethod -Uri $issues_link"?state=all&sort=updated" -Headers $headers)[0]
-        $db_updated_at = [DateTime]::Parse($app_updated.updated_at).ToUniversalTime().ToString("MM-dd-yyyy HH:mm:ss", [System.Globalization.CultureInfo]::InvariantCulture)
+        $db_updated_at = [DateTime]::Parse($app_updated.updated_at).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ssZ", [System.Globalization.CultureInfo]::InvariantCulture)
+        $db_updated_at_old = [DateTime]::Parse($app_updated.updated_at).ToUniversalTime().ToString("MM-dd-yyyy HH:mm:ss", [System.Globalization.CultureInfo]::InvariantCulture) # Do not delete this line for keep compatibility
         $open_issues_count = (Invoke-RestMethod -Uri "$compat_link" -Headers $headers).open_issues_count
         $page_count = @()
         for ($i = 0; $i -lt $open_issues_count; $i += 100) {
@@ -70,11 +71,12 @@ jobs:
         $xml.Save("app_compat_db.xml")
         "$issue_count issues have been retrieved from the compatibility database"
 
-        Add-Content -Path $env:GITHUB_ENV -Value "db_updated_at=$db_updated_at"
-        $app_updated_title = $app_updated.title
-        Add-Content -Path $env:GITHUB_ENV -Value "app_updated_title=$app_updated_title"
         $issue_id_updated = $app_updated.number
         Add-Content -Path $env:GITHUB_ENV -Value "issue_id_updated=$issue_id_updated"
+        $app_updated_title = $app_updated.title
+        Add-Content -Path $env:GITHUB_ENV -Value "app_updated_title=$app_updated_title"
+        Add-Content -Path $env:GITHUB_ENV -Value "db_updated_at=$db_updated_at"
+        Add-Content -Path $env:GITHUB_ENV -Value "db_updated_at_old=$db_updated_at_old"
 
     - name: Zip compatibility database
       run: |
@@ -98,6 +100,6 @@ jobs:
                 Invoke-RestMethod -Uri $release.url -Method DELETE -Headers @{Authorization = "Bearer $env:GITHUB_TOKEN"}
             }
         }
-        .\ghr_v0.16.2_windows_amd64\ghr -u Vita3K -r compatibility -n "Automatic CI generated database" -b "Corresponding issue: #${{ env.issue_id_updated }} for App: ${{ env.app_updated_title }}`r`nUpdated at: ${{ env.db_updated_at }}" -t "${{ secrets.GITHUB_TOKEN }}" compat_db compat_dbs/
+        .\ghr_v0.16.2_windows_amd64\ghr -u Vita3K -r compatibility -n "Automatic CI generated database" -b "Corresponding issue: #${{ env.issue_id_updated }} for App: ${{ env.app_updated_title }}`r`nUpdated at: ${{ env.db_updated_at }}`r`n<!-- Updated at: ${{ env.db_updated_at_old }} -->" -t "${{ secrets.GITHUB_TOKEN }}" compat_db compat_dbs/
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
