@@ -18,7 +18,7 @@ jobs:
         $compat_link = "https://api.github.com/repos/Vita3K/compatibility"
         $issues_link = $compat_link + "/issues"
         $app_updated = (Invoke-RestMethod -Uri $issues_link"?state=all&sort=updated" -Headers $headers)[0]
-        $db_updated_at = [DateTime]::Parse($app_updated.updated_at).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ssZ", [System.Globalization.CultureInfo]::InvariantCulture)
+        $db_updated_at = [DateTime]::Parse($app_updated.updated_at).ToUniversalTime().ToString("MM-dd-yyyy HH:mm:ss", [System.Globalization.CultureInfo]::InvariantCulture)
         $open_issues_count = (Invoke-RestMethod -Uri "$compat_link" -Headers $headers).open_issues_count
         $page_count = @()
         for ($i = 0; $i -lt $open_issues_count; $i += 100) {
