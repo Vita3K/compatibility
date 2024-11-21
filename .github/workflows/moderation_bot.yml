@@ -39,7 +39,7 @@ on:
   issues:
     types: [opened, edited]
   issue_comment:
-    types: created #, edited]
+    type: created
 
 jobs:
   automoderation:
@@ -74,7 +74,7 @@ jobs:
               issue_comment_body_trim() {
                 issue_comment_body_trim=$(echo "$issue_comment_body" | grep -i "$1" -A 10)
               }
-              issue_comment_author_whitelist=(Zangetsu38 othmanead nishinji Macdu illusionMan1212 EXtremeExploit GamingDucking Croden1999 saturnsky tasle1001 spacemul gymzatan)
+              issue_comment_author_whitelist=(Zangetsu38 othmanead nishinji Macdu illusionMan1212 EXtremeExploit GamingDucking Croden1999 saturnsky tasle1001 spacemul gymzatan Slade1972)
               for whitelisted_author in "${issue_comment_author_whitelist[@]}"; do
                 if [[ "$issue_comment_author" = "$whitelisted_author" && -z "$issue_comment_author_whitelisted" ]]; then
                   issue_comment_author_whitelisted=1

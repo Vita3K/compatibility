@@ -2,6 +2,7 @@
 #### [Commercial game compatibility database for Vita3K.](https://github.com/Vita3K/compatibility/issues)
 
 ---
+
 The [Compatibility web page](https://vita3k.org/compatibility.html) fetches data from this repo.
 
 If you want to be a tester and help test games, ask us for write access on our Discord server.
@@ -41,3 +42,9 @@ No checks by bots, but be sure to provide screenshots and logs.
 ### For testers
 
 You can remove all old labels and give new ones by writing labels under `# Recommended labels` in the issue comment.
+
+## Copyright
+
+All trademarks and copyright-written content found on this repository belong to their respective owners.
+
+Game screenshots are the property of the game's copyright holders.
