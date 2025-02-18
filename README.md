@@ -1,4 +1,5 @@
 # compatibility
+
 #### [Commercial game compatibility database for Vita3K.](https://github.com/Vita3K/compatibility/issues)
 
 ---
