@@ -1,4 +1,4 @@
-name: Compatibility database update
+﻿name: Compatibility database update
 
 on:
   push:
@@ -92,6 +92,18 @@ jobs:
         Add-Content -Path $env:GITHUB_ENV -Value "app_updated_title=$app_updated_title"
         Add-Content -Path $env:GITHUB_ENV -Value "db_updated_at=$db_updated_at"
         Add-Content -Path $env:GITHUB_ENV -Value "db_updated_at_old=$db_updated_at_old"
+
+        # Add summary
+        if ($env:GITHUB_STEP_SUMMARY) {
+        @"
+        ## 📦 Compatibility DB Update Summary
+
+        - 📄 Issues retrieved: **$issue_count**
+        - 🆕 Latest updated issue: [#${issue_id_updated} - $app_updated_title](https://github.com/Vita3K/compatibility/issues/$issue_id_updated)
+        - 🕒 Updated at: $db_updated_at
+
+        "@ | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
+        }
 
     - name: Zip compatibility database
       run: |

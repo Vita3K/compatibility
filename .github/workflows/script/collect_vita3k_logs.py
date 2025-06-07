@@ -1,4 +1,4 @@
-"""
+﻿"""
 Retrieves log files from given ("REPO_NAMES") repositories
 for offline/batch processing/searching.
 Iterates thought all issues, finds the last posted comment
@@ -16,12 +16,14 @@ https://gist.github.com/VelocityRa/c01699914c0179eb05d78bee2aeaf9c1
 from github import *
 import re
 import os
+import time
 import os.path
 import urllib.request
 
 GITHUB_TOKEN = os.environ.get('GITHUB_TOKEN')
 REPO_NAMES = ["Vita3K/compatibility", "Vita3K/homebrew-compatibility"]
 LOGS_BASE_PATH = "logs"
+repo_summaries = []  # Holds summary data for each repository
 
 # Regular expression to find log file paths
 log_files_re = re.compile(r"/files/\d+/\w+\.\w+")
@@ -60,6 +62,7 @@ for repo_full_name in REPO_NAMES:
     repo = g.get_repo(repo_full_name, lazy=False)
     issues = repo.get_issues()
 
+    start_time = time.time()
     log_count = 0
     error_log_count = 0
     for issue in issues:
@@ -102,3 +105,26 @@ for repo_full_name in REPO_NAMES:
 
     print("Total logs retrieved: {}".format(log_count))
     print("Error logs count: {}".format(error_log_count))
+
+    elapsed_time = time.time() - start_time
+    success_total = log_count + error_log_count
+    success_rate = (log_count / success_total * 100) if success_total > 0 else 0
+
+    # Store summary for each repository
+    repo_summaries.append((
+        repo_full_name,
+        log_count,
+        error_log_count,
+        round(success_rate, 1),
+        round(elapsed_time, 2)
+    ))
+
+# Write GitHub summary markdown
+summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
+if summary_path and repo_summaries:
+    with open(summary_path, "a", encoding="utf-8") as summary_file:
+        summary_file.write("## 📄 Log Retrieval Summary by Repository\n\n")
+        summary_file.write("| Repository | ✅ Logs Retrieved | ❌ Errors | 💯 Success Rate (%) | ⏱️ Duration (s) |\n")
+        summary_file.write("|------------|------------------|-----------|----------------------|-----------------|\n")
+        for repo_name, logs_ok, logs_err, rate, duration in repo_summaries:
+            summary_file.write(f"| `{repo_name}` | **{logs_ok}** | **{logs_err}** | **{rate:.1f}** | {duration:.2f} |\n")
