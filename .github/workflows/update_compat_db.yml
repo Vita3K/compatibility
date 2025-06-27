@@ -105,6 +105,11 @@ jobs:
         "@ | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
         }
 
+    - uses: actions/upload-artifact@v4
+      with:
+        name: app_compat_db.xml
+        path: app_compat_db.xml
+
     - name: Zip compatibility database
       run: |
         7z a -mx=9 app_compat_db.xml.zip app_compat_db.xml
@@ -117,7 +122,7 @@ jobs:
         cp app_compat_db.xml.zip compat_dbs/
         # cp app_compat_db.xml.7z compat_dbs/
 
-    - name: Upload compatibility database
+    - name: Release compatibility database
       run: |
         Invoke-WebRequest "https://github.com/tcnksm/ghr/releases/download/v0.17.0/ghr_v0.17.0_windows_amd64.zip" -OutFile ghr.zip
         Expand-Archive -Force -Path ghr.zip -DestinationPath '.'
