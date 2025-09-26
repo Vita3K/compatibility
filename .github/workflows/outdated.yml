@@ -1,0 +1,24 @@
+# Documentation - https://github.com/actions/stale
+
+name: Mark stale issues
+
+on:
+  schedule:
+  - cron: '0 0 * * 0' # Every Sunday at midnight
+
+jobs:
+  stale:
+
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+
+    steps:
+    - uses: actions/stale@v5
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        days-before-stale: 365
+        stale-issue-label: 'outdated'
+        exempt-issues-labels: 'Playable, online-only'
+        days-before-close: -1
+        # operations-per-run: 1000 (default is 30)
