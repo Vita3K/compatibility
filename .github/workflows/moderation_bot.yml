@@ -133,7 +133,7 @@ jobs:
               # Check Vita3K version
               if [[ "${issue_body,,}" =~ "commit hash" ]]; then
                 issue_body_trim1 'Commit hash'
-                if [[ "$issue_body_trim1" =~ (.+ https://github.com/vita3k/vita3k/commit/[0-9a-f]{5,40}) ]]; then
+                if [[ "${issue_body_trim1,,}" =~ (.+ https://github.com/vita3k/vita3k/commit/[0-9a-f]{5,40}) ]]; then
                   echo 'Commit hash is valid.'
                 else
                   compatibility_report_invalidate 'Commit hash is invalid or missing.'
