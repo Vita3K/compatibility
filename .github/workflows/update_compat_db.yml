@@ -13,7 +13,7 @@ jobs:
     runs-on: windows-latest
     if: github.repository == 'Vita3K/compatibility'
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Generate compatibility database xml file
       run: |
         $headers = @{
