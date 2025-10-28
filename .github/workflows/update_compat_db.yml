@@ -11,7 +11,6 @@ concurrency:
 jobs:
   update_compat_db:
     runs-on: windows-latest
-    if: github.repository == 'Vita3K/compatibility'
     steps:
     - uses: actions/checkout@v5
     - name: Generate compatibility database xml file
@@ -48,6 +47,8 @@ jobs:
         $issue_count = 0
 
         # 4. Retrieve issue information
+        $app_nodes = @()
+
         foreach ($page in $page_count) {
             $current_page = $page.First
             $per_page = $page.Second
@@ -75,11 +76,20 @@ jobs:
                 $updated_atNode = $xml.CreateElement("updated_at")
                 $updated_atNode.InnerText = $ts_updated_at
                 $issueNode.AppendChild($updated_atNode) | Out-Null
-            
-                $root.AppendChild($issueNode) | Out-Null
-                $issue_count++
+    
+                # Save to temporary array
+                $app_nodes += $issueNode
             }
         }
+
+        # Sort by Title ID in ascending order, then add to XML
+        $app_nodes_sorted = $app_nodes | Sort-Object { $_.GetAttribute("title_id") }
+
+        foreach ($node in $app_nodes_sorted) {
+            $root.AppendChild($node) | Out-Null
+            $issue_count++
+        }
+
 
         # 5. Construct XML nodes
         $root.SetAttribute("issue_count", $issue_count)
@@ -123,6 +133,7 @@ jobs:
         # cp app_compat_db.xml.7z compat_dbs/
 
     - name: Release compatibility database
+      if: github.repository == 'Vita3K/compatibility'
       run: |
         Invoke-WebRequest "https://github.com/tcnksm/ghr/releases/download/v0.17.0/ghr_v0.17.0_windows_amd64.zip" -OutFile ghr.zip
         Expand-Archive -Force -Path ghr.zip -DestinationPath '.'
