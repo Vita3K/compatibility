@@ -11,7 +11,7 @@ jobs:
     if: github.repository == 'Vita3K/compatibility'
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Set up Python
       uses: actions/setup-python@v6
@@ -33,13 +33,13 @@ jobs:
         7z a -mx=9 logs.7z logs/
 
     - name: Upload log files
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: logs-archive-zip
         path: logs/
 
     - name: Upload 7zipped log files
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: logs-archive-7z
         path: logs.7z
