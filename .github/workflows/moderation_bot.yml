@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository == 'Vita3K/compatibility'
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: checking an issue
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
