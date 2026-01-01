@@ -33,13 +33,13 @@ jobs:
         7z a -mx=9 logs.7z logs/
 
     - name: Upload log files
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: logs-archive-zip
         path: logs/
 
     - name: Upload 7zipped log files
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: logs-archive-7z
         path: logs.7z
