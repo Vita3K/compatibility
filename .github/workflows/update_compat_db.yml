@@ -1,4 +1,4 @@
-﻿name: Compatibility database update
+name: Compatibility database update
 
 on:
   push:
@@ -13,7 +13,7 @@ jobs:
   update_compat_db:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Generate compatibility database xml file
       run: |
         $headers = @{
@@ -116,7 +116,7 @@ jobs:
         "@ | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
         }
 
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v6
       with:
         name: app_compat_db.xml
         path: app_compat_db.xml
