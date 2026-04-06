@@ -8,8 +8,9 @@ The [Compatibility web page](https://vita3k.org/compatibility.html) fetches data
 
 If you want to be a tester and help test games, ask us for write access on our Discord server.
 
-> [!NOTE]
-> This repository does **not** guarantee compatibility and is not intended for Android. Submit Android specific issues [here](https://github.com/Vita3K/Vita3K-Android/issues).
+> [!WARNING]
+> This repository does **not** guarantee compatibility and is **not intended for Android.** Submit Android report [here](https://github.com/Vita3K/Vita3K-Android/issues).
+> Reports regarding Android will be marked as off-topic.
 
 ### What NOT to post:
 

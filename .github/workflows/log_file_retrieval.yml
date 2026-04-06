@@ -41,5 +41,5 @@ jobs:
     - name: Upload 7zipped log files
       uses: actions/upload-artifact@v7
       with:
-        name: logs-archive-7z
         path: logs.7z
+        archive: false
