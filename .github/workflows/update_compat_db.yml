@@ -2,7 +2,6 @@ name: Compatibility database update
 
 on:
   push:
-    branches: [ master ]
   issues:
 
 concurrency:
@@ -47,8 +46,12 @@ jobs:
         $xml.AppendChild($root) | Out-Null
         $issue_count = 0
 
+        # Valid label IDs
+        $validLabelIds = @(1260231569, 1344750319, 1260231381, 1344751053, 1344752299, 1260231985, 920344019)
+
         # 4. Retrieve issue information
         $app_nodes = @()
+        $invalid_label_report = @()
 
         foreach ($page in $page_count) {
             $current_page = $page.First
@@ -71,13 +74,19 @@ jobs:
                     $labelNode.InnerText = $label.id
                     $labelsNode.AppendChild($labelNode) | Out-Null
                 }
+
+                # Check if the issue contains at least one valid label
+                $hasValidLabel = $issue.labels | Where-Object { $validLabelIds -contains [long]$_.id }
+                if (-not $hasValidLabel) {
+                    $invalid_label_report += "  - issue: [#$($issue.number) - $($issue.title)](https://github.com/Vita3K/compatibility/issues/$($issue.number)) / no valid compatibility label found"
+                }
                 $issueNode.AppendChild($labelsNode) | Out-Null
 
                 $ts_updated_at = (([DateTime]::Parse($issue.updated_at).ToUniversalTime()) - ([DateTime]::Parse('01/01/1970 00:00:00'))).TotalSeconds
                 $updated_atNode = $xml.CreateElement("updated_at")
                 $updated_atNode.InnerText = $ts_updated_at
                 $issueNode.AppendChild($updated_atNode) | Out-Null
-    
+
                 # Save to temporary array
                 $app_nodes += $issueNode
             }
@@ -85,6 +94,16 @@ jobs:
 
         # Sort by Title ID in ascending order, then add to XML
         $app_nodes_sorted = $app_nodes | Sort-Object { $_.GetAttribute("title_id") }
+
+        # Detect duplicate title_ids
+        $title_id_groups = $app_nodes_sorted | Group-Object { $_.GetAttribute("title_id") } | Where-Object { $_.Count -gt 1 }
+        $duplicate_report = @()
+        foreach ($group in $title_id_groups) {
+            foreach ($node in $group.Group) {
+                $issue_id = $node.SelectSingleNode("issue_id").InnerText
+                $duplicate_report += "  - title_id: ``$($group.Name)`` / issue_id: #$issue_id"
+            }
+        }
 
         foreach ($node in $app_nodes_sorted) {
             $root.AppendChild($node) | Out-Null
@@ -106,6 +125,12 @@ jobs:
 
         # Add summary
         if ($env:GITHUB_STEP_SUMMARY) {
+            $dup_section = if ($duplicate_report.Count -gt 0) {
+                "### ⚠️ Duplicate title_id detected`n`n" + ($duplicate_report -join "`n")
+            }
+            $invalid_label_section = if ($invalid_label_report.Count -gt 0) {
+                "### ⚠️ Invalid label_id detected`n`n" + ($invalid_label_report -join "`n")
+            }
         @"
         ## 📦 Compatibility DB Update Summary
 
@@ -113,13 +138,16 @@ jobs:
         - 🆕 Latest updated issue: [#${issue_id_updated} - $app_updated_title](https://github.com/Vita3K/compatibility/issues/$issue_id_updated)
         - 🕒 Updated at: $db_updated_at
 
+        $dup_section
+
+        $invalid_label_section
         "@ | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
         }
 
     - uses: actions/upload-artifact@v7
       with:
-        name: app_compat_db.xml
         path: app_compat_db.xml
+        archive: false
 
     - name: Zip compatibility database
       run: |
@@ -134,7 +162,7 @@ jobs:
         # cp app_compat_db.xml.7z compat_dbs/
 
     - name: Release compatibility database
-      if: github.repository == 'Vita3K/compatibility'
+      if: github.repository == 'Vita3K/compatibility' && github.ref == 'refs/heads/master'
       run: |
         Invoke-WebRequest "https://github.com/tcnksm/ghr/releases/download/v0.17.0/ghr_v0.17.0_windows_amd64.zip" -OutFile ghr.zip
         Expand-Archive -Force -Path ghr.zip -DestinationPath '.'
