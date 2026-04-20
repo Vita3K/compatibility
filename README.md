@@ -41,6 +41,9 @@ The following checks are performed by the bot, and those that do not meet will b
 
 No checks by bots, but be sure to provide screenshots and logs.
 
+> [!IMPORTANT]
+> When updating your status, please submit screenshots and your log file. In particular, if you wish to change your status to “Playable,” please submit at least three screenshots.
+
 ### For testers
 
 You can remove all old labels and give new ones by writing labels under `# Recommended labels` in the issue comment.
