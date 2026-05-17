@@ -162,16 +162,15 @@ jobs:
         # cp app_compat_db.xml.7z compat_dbs/
 
     - name: Release compatibility database
+      uses: tcnksm/ghr@v0
       if: github.repository == 'Vita3K/compatibility' && github.ref == 'refs/heads/master'
-      run: |
-        Invoke-WebRequest "https://github.com/tcnksm/ghr/releases/download/v0.17.0/ghr_v0.17.0_windows_amd64.zip" -OutFile ghr.zip
-        Expand-Archive -Force -Path ghr.zip -DestinationPath '.'
-        $releases = Invoke-RestMethod -Uri "https://api.github.com/repos/Vita3K/compatibility/releases" -Headers @{Authorization = "Bearer $env:GITHUB_TOKEN"}
-        if ($releases -ne $null) {
-            foreach ($release in $releases) {
-                Invoke-RestMethod -Uri $release.url -Method DELETE -Headers @{Authorization = "Bearer $env:GITHUB_TOKEN"}
-            }
-        }
-        .\ghr_v0.17.0_windows_amd64\ghr -u Vita3K -r compatibility -n "Automatic CI generated database" -b "Corresponding issue: #${{ env.issue_id_updated }} for App: ${{ env.app_updated_title }}`r`nLast updated: ${{ env.db_updated_at }}`r`n<!-- Updated at: ${{ env.db_updated_at_old }} -->" -t "${{ secrets.GITHUB_TOKEN }}" compat_db compat_dbs/
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag: compat_db
+        path: compat_dbs/
+        delete: true
+        owner: Vita3K
+        repository: compatibility
+        name: Automatic CI generated database
+        body: "Corresponding issue: #${{ env.issue_id_updated }} for App: ${{ env.app_updated_title }}\nLast updated: ${{ env.db_updated_at }}\n<!-- Updated at: ${{ env.db_updated_at_old }} -->"
