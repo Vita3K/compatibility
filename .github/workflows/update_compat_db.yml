@@ -87,6 +87,34 @@ jobs:
                 $updated_atNode.InnerText = $ts_updated_at
                 $issueNode.AppendChild($updated_atNode) | Out-Null
 
+                # Load package database json
+                $packages_db = Get-Content "patches.json" -Raw | ConvertFrom-Json
+
+                # Add package information
+                if ($packages_db.PSObject.Properties.Name -contains $title) {
+                    $packagesNode = $xml.CreateElement("packages")
+
+                    foreach ($pkg in $packages_db.$title) {
+                        $packageNode = $xml.CreateElement("package")
+
+                        $versionNode = $xml.CreateElement("version")
+                        $versionNode.InnerText = $pkg.version
+                        $packageNode.AppendChild($versionNode) | Out-Null
+
+                        $systemVersionNode = $xml.CreateElement("system_version")
+                        $systemVersionNode.InnerText = $pkg.system_version
+                        $packageNode.AppendChild($systemVersionNode) | Out-Null
+
+                        $sizeNode = $xml.CreateElement("size_MB")
+                        $sizeNode.InnerText = $pkg.size_MB
+                        $packageNode.AppendChild($sizeNode) | Out-Null
+
+                        $packagesNode.AppendChild($packageNode) | Out-Null
+                    }
+
+                    $issueNode.AppendChild($packagesNode) | Out-Null
+                }
+
                 # Save to temporary array
                 $app_nodes += $issueNode
             }
