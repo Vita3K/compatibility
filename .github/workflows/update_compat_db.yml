@@ -152,14 +152,14 @@ jobs:
     - name: Zip compatibility database
       run: |
         7z a -mx=9 app_compat_db.xml.zip app_compat_db.xml
-        # 7z a -mx=9 app_compat_db.xml.7z app_compat_db.xml
+        7z a -mx=9 app_compat_db.xml.7z app_compat_db.xml
 
     - name: Prepare files for release
       run: |
         mkdir compat_dbs
         cp app_compat_db.xml compat_dbs/
         cp app_compat_db.xml.zip compat_dbs/
-        # cp app_compat_db.xml.7z compat_dbs/
+        cp app_compat_db.xml.7z compat_dbs/
 
     - name: Release compatibility database
       uses: tcnksm/ghr@v0
