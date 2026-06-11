@@ -14,7 +14,7 @@ on:
 jobs:
   automoderation:
     runs-on: ubuntu-latest
-    if: github.repository == 'Vita3K/compatibility'
+    if: github.repository == 'Vita3K/compatibility' && (github.event.action != 'edited' || github.event.changes.title.from == null) ## Don't run on edited issue title
     steps:
       - uses: actions/checkout@v6
       - name: checking an issue
