@@ -4,6 +4,11 @@ on:
   schedule:
   - cron: '0 0 1 * *' # Runs at midnight on the first day of each month
   workflow_dispatch:
+    # inputs:
+    #   scan_since_days:
+    #     description: 'Comment scan: only check the last N days (empty = every comment)'
+    #     required: false
+    #     default: ''
 
 jobs:
   retrieve_logs:
@@ -43,3 +48,43 @@ jobs:
       with:
         path: logs.7z
         archive: false
+
+  scan_comments:
+    runs-on: ubuntu-latest
+    if: github.repository == 'Vita3K/compatibility'
+    timeout-minutes: 120 # the scan waits on the API quota, it is not in a hurry
+    permissions:
+      contents: read
+      issues: write # to mark the Android comments as off topic
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v6
+
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: |
+        pip install PyGithub
+
+    - name: Scan issue comments for copyright and Android reports
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
+        # Quotas of the API key, defaults to the free tier (250000 / 15)
+        GEMINI_TPM: ${{ vars.GEMINI_TPM }}
+        GEMINI_RPM: ${{ vars.GEMINI_RPM }}
+        SCAN_SINCE_DAYS: ${{ inputs.scan_since_days }}
+      run: |
+        python .github/workflows/script/scan_issue_comments.py
+
+    - name: Upload comment scan report
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        path: comment_scan_report.json
+        archive: false
+        if-no-files-found: ignore
