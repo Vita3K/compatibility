@@ -18,6 +18,7 @@ import re
 import os
 import time
 import os.path
+import urllib.error
 import urllib.request
 
 GITHUB_TOKEN = os.environ.get('GITHUB_TOKEN')
@@ -25,21 +26,38 @@ REPO_NAMES = ["Vita3K/compatibility", "Vita3K/homebrew-compatibility"]
 LOGS_BASE_PATH = "logs"
 repo_summaries = []  # Holds summary data for each repository
 
-# Regular expression to find log file paths
-log_files_re = re.compile(r"/files/\d+/\w+\.\w+")
+# Regular expression to find log file URLs. GitHub serves attachments from
+# github.com/user-attachments/files/... nowadays, older comments still hold the
+# github.com/<owner>/<repo>/files/... form, so take the URL as it was written.
+log_files_re = re.compile(r"https://github\.com/[^\s)\]\"'<>]*?/files/\d+/[^\s)\]\"'<>]+")
+# Where the old form 404s, the file is only left under user-attachments
+legacy_url_re = re.compile(r"^https://github\.com/[^/]+/[^/]+/files/(\d+/.+)$")
 
 # Ensure logs base path exists
 logs_path = os.path.normpath(os.path.join(os.getcwd(), LOGS_BASE_PATH))
 if not os.path.exists(logs_path):
     os.mkdir(logs_path)
 
+# Archives and images are stored as text here, so they were never usable
+skipped_extensions = (".zip", ".7z", ".rar", ".gz", ".png", ".jpg", ".jpeg", ".gif", ".mp4", ".pdf")
+
 # Function to find log files in a comment or issue body
 def find_log_files(text):
-    return log_files_re.findall(text)
+    return [url for url in log_files_re.findall(text)
+            if not url.lower().endswith(skipped_extensions)]
 
-# Function to fix up log file paths (modify this function as needed)
-def fixup_log_file_paths(log_files, repo_name):
-    return [r"https://github.com/" + repo_name + "/" + log_file for log_file in log_files]
+# Function to download a log, retrying the ones GitHub only keeps under
+# user-attachments now
+def download_log(log_url):
+    try:
+        return urllib.request.urlopen(log_url).read().decode('utf-8')
+    except urllib.error.HTTPError as http_error:
+        legacy_match = legacy_url_re.match(log_url)
+        if http_error.code != 404 or not legacy_match:
+            raise
+        moved_url = "https://github.com/user-attachments/files/" + legacy_match.group(1)
+        print("Moved to: {}".format(moved_url))
+        return urllib.request.urlopen(moved_url).read().decode('utf-8')
 
 # Function to normalize the file name
 def normalize_file_name(title):
@@ -68,17 +86,12 @@ for repo_full_name in REPO_NAMES:
     for issue in issues:
         # Combine issue body and comments to search for log files
         comments = issue.get_comments()
-        first_comment = issue.body
+        first_comment = issue.body or ""
 
         if comments:
             for comment in comments:
-                first_comment += "\n" + comment.body
+                first_comment += "\n" + (comment.body or "")
         logs_posted = find_log_files(first_comment)
-
-        if len(logs_posted) == 0:
-            logs_posted = find_log_files(issue.body)
-
-        logs_posted = fixup_log_file_paths(logs_posted, repo_full_name)
 
         print("Issue #{} for game {}".format(issue.id, issue.title))
         for log_id, log in enumerate(logs_posted):
@@ -92,7 +105,7 @@ for repo_full_name in REPO_NAMES:
 
             try:
                 print("Retrieving: {} as {}".format(log, normalized_file_name))
-                log_content = urllib.request.urlopen(log).read().decode('utf-8')
+                log_content = download_log(log)
 
                 # Write to individual log file
                 with open(log_full_path_cur, 'w') as individual_log_file:
